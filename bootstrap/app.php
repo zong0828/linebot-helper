@@ -21,9 +21,9 @@ $app = new Laravel\Lumen\Application(
     dirname(__DIR__)
 );
 
-// $app->withFacades();
+$app->withFacades();
 
-// $app->withEloquent();
+$app->withEloquent();
 
 /*
 |--------------------------------------------------------------------------
@@ -90,11 +90,19 @@ $app->singleton(
 | can respond to, as well as the controllers that may handle them.
 |
 */
+$namespace = 'App\Http\Controllers';
 
 $app->router->group([
-    'namespace' => 'App\Http\Controllers\LineBot',
+    'namespace' => $namespace,
+    'prefix' => 'api/v1',
 ], function ($router) {
-    require __DIR__.'/../routes/router.php';
+    require __DIR__.'/../routes/api_v1.php';
 });
+
+// $app->router->group([
+//     'namespace' => 'App\Http\Controllers\LineBot',
+// ], function ($router) {
+//     require __DIR__.'/../routes/router.php';
+// });
 
 return $app;

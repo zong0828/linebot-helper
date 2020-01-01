@@ -1,10 +1,15 @@
 <?php
-
 namespace App\Http\Controllers\LineBot;
 
 use App\Http\Controllers\Controller as BaseController;
 use Illuminate\Http\Request;
+use Log;
+use App\Service\Resource\LineBot;
+use App\Service\AccountingService;
 
+/**
+ * Line bot controller
+ */
 class LinebotController extends BaseController
 {
     /**
@@ -17,33 +22,22 @@ class LinebotController extends BaseController
         //
     }
 
-    public function mainAction(Request $request)
+    public function accountingAction(Request $request)
     {
-        // TODO 驗證數位簽章 header
+        $LineBot = new LineBot(env('LINE_ACCESS_TOKEN'), env('LINE_SECRET'));
+
         $lineRequest = $request->all();
+        Log::info(json_encode($lineRequest, JSON_UNESCAPED_UNICODE));
+        // $response = (new AccountingService())->getResponse($lineRequest);
 
-        $replyToken = $lineRequest['events'][0]['replyToken'];
-
-        // line settting
-        $access_token = env('LINE_ACCESS_TOKEN');
-        $secret = env('LINE_SECRET');
-
-        $httpClient = new \LINE\LINEBot\HTTPClient\CurlHTTPClient($access_token);
-        $bot = new \LINE\LINEBot($httpClient, ['channelSecret' => $secret]);
-        // $response = $bot->replyText($replyToken, 'hello!');
-        $textMessageBuilder = new \LINE\LINEBot\MessageBuilder\TextMessageBuilder('hello');
-        $response = $bot->replyMessage($replyToken, $textMessageBuilder);
-        if ($response->isSucceeded()) {
-            echo 'Succeeded!';
-            return;
-        }
-
-        // Failed
-        echo $response->getHTTPStatus() . ' ' . $response->getRawBody();
+        $LineBot->textResponse($lineRequest['events'][0]['replyToken']);
     }
 
-    public function test()
+    public function test(Request $request, AccountingService $AccountingService)
     {
-        echo "mytest";
+        $lineRequest = $request->all();
+        $response = $AccountingService->getResponse($lineRequest);
+
+        echo $response;
     }
 }

@@ -2,6 +2,7 @@
 namespace App\Service\Resource;
 
 use Log;
+use Ixudra\Curl\Facades\Curl;
 
 /**
  * Linebot class
@@ -9,16 +10,20 @@ use Log;
 class LineBot
 {
     private $bot;
+    private $botUrl;
+    private $accessToken;
 
     /**
      * __construct
      *
      * @return void
      */
-    public function __construct($access_token, $secret)
+    public function __construct($accessToken, $secret)
     {
-        $httpClient = new \LINE\LINEBot\HTTPClient\CurlHTTPClient($access_token);
+        $httpClient = new \LINE\LINEBot\HTTPClient\CurlHTTPClient($accessToken);
         $this->bot = new \LINE\LINEBot($httpClient, ['channelSecret' => $secret]);
+        $this->botUrl = env('LINE_BOT_URL');
+        $this->accessToken = $accessToken;
     }
 
     /**
@@ -38,5 +43,29 @@ class LineBot
 
         // Failed
         Log::info(json_encode($response, JSON_UNESCAPED_UNICODE));
+    }
+
+    /**
+     * 取得 user name
+     *
+     * @param string $userId
+     * @return array
+     */
+    public function getProfile($userId)
+    {
+        $authorization = "Authorization: Bearer {$this->accessToken}";
+        $url = $this->botUrl . "/profile" . "/{$userId}";
+
+        $response = Curl::to($url)->withHeader($authorization)->get();
+
+        Log::info($response);
+        $lineUser = json_decode($response, true);
+
+        if (empty($lineUser['displayName'])) {
+            Log::info('miss display name');
+            throw new \Exception('miss displayName');
+        }
+
+        return $lineUser;
     }
 }

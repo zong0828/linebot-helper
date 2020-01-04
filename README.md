@@ -12,6 +12,7 @@ line bot helper 是一個 line bot server ，其功能是藉由開通一個 line
 
 1. 調整 RouteX -> ControllerX -> ServiceX -> Repository -> Model 架構
 2. 調整 api request 與 exception log
+3. 調整 exeption 的方式
 
 Rules :
 | 功能 | 格式 | 介紹 |
@@ -50,6 +51,7 @@ FLUSH PRIVILEGES;
 
 ```bash=
 # -t 指定目錄
+php -S 0.0.0.0:80 -t public
 ```
 
 ### 用 ngrok proxy localhost:80

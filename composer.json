@@ -6,6 +6,7 @@
     "type": "project",
     "require": {
         "php": "^7.2",
+        "ixudra/curl": "^6.18",
         "laravel/lumen-framework": "^6.0",
         "linecorp/line-bot-sdk": "^4.1"
     },

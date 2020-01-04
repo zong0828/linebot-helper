@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Log;
 use App\Service\Resource\LineBot;
 use App\Service\AccountingService;
+use Illuminate\Support\Collection;
 
 /**
  * Line bot controller
@@ -25,19 +26,28 @@ class LinebotController extends BaseController
     public function accountingAction(Request $request)
     {
         $LineBot = new LineBot(env('LINE_ACCESS_TOKEN'), env('LINE_SECRET'));
+        $AccountingService = new AccountingService();
 
-        $lineRequest = $request->all();
-        Log::info(json_encode($lineRequest, JSON_UNESCAPED_UNICODE));
-        // $response = (new AccountingService())->getResponse($lineRequest);
+        $webhook = $request->all();
+        Log::info(json_encode($webhook, JSON_UNESCAPED_UNICODE));
 
-        $LineBot->textResponse($lineRequest['events'][0]['replyToken']);
+        $userMessage = $AccountingService->getUserMessage($webhook);
+        $userName = $AccountingService->getUserInfo($userMessage['userId'], $LineBot);
+        // TODO
+
+        $replyToken = $webhook['events'][0]['replyToken'];
+        $LineBot->textResponse($replyToken);
     }
 
     public function test(Request $request, AccountingService $AccountingService)
     {
-        $lineRequest = $request->all();
-        $response = $AccountingService->getResponse($lineRequest);
+        var_export($AccountingService->getUserInfo(1));
 
-        echo $response;
+        // $lineRequest = $request->all();
+        // $response = $AccountingService->getResponse($lineRequest);
+        // echo $response;
+
+        // $LineBot = new LineBot(env('LINE_ACCESS_TOKEN'), env('LINE_SECRET'));
+        // $res = $LineBot->getProfile('U413f23aa7880f3f4d149f908e3f59bbd');
     }
 }

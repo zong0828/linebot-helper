@@ -25,22 +25,22 @@ class LinebotController extends BaseController
 
     public function accountingAction(Request $request)
     {
-        $LineBot = new LineBot(env('LINE_ACCESS_TOKEN'), env('LINE_SECRET'));
-        $AccountingService = new AccountingService();
-
         $webhook = $request->all();
         Log::info(json_encode($webhook, JSON_UNESCAPED_UNICODE));
-
-        $userMessage = $AccountingService->getUserMessage($webhook);
-        $userName = $AccountingService->getUserInfo($userMessage['userId'], $LineBot);
-        // TODO
-
+        # 提早設定以免發生 exception
         $replyToken = $webhook['events'][0]['replyToken'];
-        $LineBot->textResponse($replyToken);
+
+        $LineBot = new LineBot(env('LINE_ACCESS_TOKEN'), env('LINE_SECRET'));
+        $AccountingService = new AccountingService($LineBot);
+
+        # 取得回應 message
+        $message = $AccountingService->getMessage($webhook, $LineBot);
+        $LineBot->textResponse($replyToken, $message);
     }
 
     public function test(Request $request, AccountingService $AccountingService)
     {
+        throw new \Exception('test');
         var_export($AccountingService->getUserInfo(1));
 
         // $lineRequest = $request->all();

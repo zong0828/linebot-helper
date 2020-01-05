@@ -13,6 +13,7 @@ line bot helper 是一個 line bot server ，其功能是藉由開通一個 line
 1. 調整 RouteX -> ControllerX -> ServiceX -> Repository -> Model 架構
 2. 調整 api request 與 exception log
 3. 調整 exeption 的方式
+4. 包裝 docker image
 
 Rules :
 | 功能 | 格式 | 介紹 |
@@ -26,27 +27,6 @@ Example :
 
 ## Build
 
-### mysql
-
-用 docker 啟動 mysql，因為使用最新版本的 mysql 使用一些 sqlpro 等等 sql client 工具會因為密碼的加密方式改變(mysql_native_password -> caching_sha2_password) 因此需要把它改回來。
-
-```bash=
-
-# 啟動 mysql 容器
-docker run --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -d mysql
-
-# 進入容器
-docker exec -ti mysql bash
-
-mysql -u root -p
-
-ALTER USER 'root'@'%' IDENTIFIED BY 'root' PASSWORD EXPIRE NEVER;
-
-ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'root';
-
-FLUSH PRIVILEGES;
-```
-
 ### lumen 啟動方式
 
 ```bash=
@@ -58,4 +38,31 @@ php -S 0.0.0.0:80 -t public
 
 ```bash=
 ngrok http 80
+```
+
+### docker env command
+TODO nginx setting
+
+```bash=
+docker create network side-project
+
+# mysql
+docker run --network side-project --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -d mysql
+
+# 基於 mysql 某版本之後加密方式的改變導致一些 sql client 無法連線
+ALTER USER 'root'@'%' IDENTIFIED BY 'root' PASSWORD EXPIRE NEVER;
+ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'root';
+FLUSH PRIVILEGES;
+
+# nginx
+docker pull nginx
+
+docker run --network side-project --name side-project-nginx -p 80:80 -v ${PWD}:/usr/share/nginx/html/linebot-helper -d nginx
+```
+
+- 手動改 nginx 設定
+
+```bash=
+# 安裝 vim
+apt-get update; apt-get install vim;
 ```

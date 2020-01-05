@@ -76,6 +76,11 @@ $app->singleton(
 |
 */
 $app->register(Ixudra\Curl\CurlServiceProvider::class);
+$app->register('Sentry\Laravel\ServiceProvider');
+collect(scandir(__DIR__ . '/../config'))->each(function ($item) use ($app) {
+    $app->configure(basename($item, '.php'));
+});
+
 // $app->register(App\Providers\AppServiceProvider::class);
 // $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);

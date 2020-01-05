@@ -32,9 +32,9 @@ class LineBot
      * @param string $message
      * @return void
      */
-    public function textResponse($replyToken, $message = '')
+    public function textResponse($replyToken, $message = 'missing message')
     {
-        $response = $this->bot->replyText($replyToken, 'hi');
+        $response = $this->bot->replyText($replyToken, $message);
 
         if ($response->isSucceeded()) {
             Log::info('success');
@@ -62,7 +62,6 @@ class LineBot
         $lineUser = json_decode($response, true);
 
         if (empty($lineUser['displayName'])) {
-            Log::info('miss display name');
             throw new \Exception('miss displayName');
         }
 
